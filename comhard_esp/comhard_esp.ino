@@ -15,6 +15,16 @@ float tempc;
 int button;
 String data,dataimg;
 String message = "กบ ปลื้ม บริล มุก";
+char *menu[27] = {
+  "name1","name2","name3","name4","name5","name6","name7","name8","name9","name10","name11","name12",
+  "name13","name14","name15","name16","name17","name18","name19","name20",
+  "name21","name22","name23","name24","name25","name26","name27"
+  };
+char *menuimg[27] = {
+  "img1","img2","img3","img4","img5","img6","img7","img8","img9","img10","img11","img12",
+  "img13","img14","img15","img16","img17","img18","img19","img20","img21","img22","img23","img24",
+  "img25","img26","img27",
+};
 void setup() {
   delay(50);
   Serial.begin(115200);
@@ -34,64 +44,65 @@ void setup() {
 }
 
 void loop() {
-//client_get();
 button = digitalRead(D1);
 Serial.println(button);
 if(button == HIGH){
   digitalWrite(led,HIGH);
   delay(1000);
   digitalWrite(led,LOW);
-  data = client_get();
-  dataimg = client_getimg();
-  Serial.println(data);
-  Serial.println(dataimg);
+  for(int i=0;i<=26;i++){
+    data = client_get(menu[i]);
+    dataimg = client_getimg(menuimg[i]);
+    Serial.println(data);
+    Serial.println(dataimg);
+    Line_notify(data,dataimg);
+    delay(6000);
 
-  Line_notify(data,dataimg);
-}
+  }
+
+  
+  }
 delay(1000);
 }
-String client_get(){
+String client_get(String qnameitem){
   String payload;
   const char *name_item;
-  StaticJsonDocument<256> doc;
-  Serial.println("get data");
+  DynamicJsonDocument doc(6500);
   HTTPClient http;
   http.begin("http://43.228.85.133/menu/?fbclid=IwAR3O4MCu5v-Yj1IX95BVsdRRzdAQ2UQsolKFgvfhxwN5bdA-mnX8CR8scfQ");
 
   int httpcode = http.GET();
 
   if(httpcode > 0){
-    Serial.println("have data");
+    Serial.println("get data");
     payload = http.getString();
+//    Serial.println(payload);
     DeserializationError err = deserializeJson(doc,payload);
-
-    name_item = doc["name1"];
+     
+    name_item = doc[qnameitem];
+//    Serial.println(name_item);
+    
   }
-
-  Serial.println("end");
   http.end();
   return name_item;
 }
 
-String client_getimg(){
+String client_getimg(String qnameimg){
   String payload;
   const char *name_img;
-  StaticJsonDocument<256> doc;
-  Serial.println("get data");
+  DynamicJsonDocument doc(6500);
   HTTPClient http;
   http.begin("http://43.228.85.133/menu/?fbclid=IwAR3O4MCu5v-Yj1IX95BVsdRRzdAQ2UQsolKFgvfhxwN5bdA-mnX8CR8scfQ");
 
   int httpcode = http.GET();
 
   if(httpcode > 0){
-    Serial.println("have data");
+    Serial.println("get data img");
     payload = http.getString();
     DeserializationError err = deserializeJson(doc,payload);
 
-    name_img = doc["img1"];
+    name_img = doc[qnameimg];
   }
-
-  Serial.println("end");
   http.end();
   return name_img;
 }
