@@ -3,18 +3,19 @@
 #include<WiFiClientSecureAxTLS.h> 
 #include<ArduinoJson.h>
 #include<TridentTD_LineNotify.h>
-
-
+#include<SoftwareSerial.h>
 
 #define SSID "Chakthip"
 #define PASSWORD "0816879589"
 #define LINE_TOKEN "isOT5gbxeiAnHPgqgnDFtfkCvxo7wk8mjJ8uHSJTwEk"
 int sw = D1;
 int led = D0;
+int val;
 float tempc;
 int button;
 String data,dataimg;
 String message = "กบ ปลื้ม บริล มุก";
+SoftwareSerial NodeSerial(D5,D6); //RX,TX
 char *menu[27] = {
   "name1","name2","name3","name4","name5","name6","name7","name8","name9","name10","name11","name12",
   "name13","name14","name15","name16","name17","name18","name19","name20",
@@ -28,6 +29,7 @@ char *menuimg[27] = {
 void setup() {
   delay(50);
   Serial.begin(115200);
+  NodeSerial.begin(4800);
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID,PASSWORD);
   Serial.println("Connecting");
@@ -40,27 +42,41 @@ void setup() {
   Serial.println(LINE.getVersion());
   pinMode(sw,OUTPUT);
   pinMode(led,OUTPUT);
+  pinMode(D5,INPUT);
+  pinMode(D6,OUTPUT);
   
 }
 
 void loop() {
+while(1){
+    if(NodeSerial.available()>0){
+        Serial.print("รับ");
+        val = NodeSerial.parseFloat();
+        if(NodeSerial.read() == '\n'){
+          Serial.println(val);
+        }
+        break;
+    }
+}
 button = digitalRead(D1);
 Serial.println(button);
 if(button == HIGH){
   digitalWrite(led,HIGH);
   delay(1000);
   digitalWrite(led,LOW);
-  for(int i=0;i<=26;i++){
-    data = client_get(menu[i]);
-    dataimg = client_getimg(menuimg[i]);
-    Serial.println(data);
-    Serial.println(dataimg);
-    Line_notify(data,dataimg);
-    delay(6000);
 
+  for(int i=1;i<=27;i++){
+    if(i == val){
+      data = client_get(menu[i-1]);
+      dataimg = client_getimg(menuimg[i-1]);
+      break;
+    }
   }
-
   
+  Serial.println(data);
+  Serial.println(dataimg);
+  Line_notify(data,dataimg);
+  delay(6000);
   }
 delay(1000);
 }
