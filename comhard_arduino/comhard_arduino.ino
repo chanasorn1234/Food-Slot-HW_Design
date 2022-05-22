@@ -27,26 +27,19 @@ void loop() {
   delay(1000);
  }
  digitalWrite(cmd,HIGH); // stateส่งไปfpga
- int digit0 = digitalRead(bit0);
- int digit1 = digitalRead(bit1);
- int digit2 = digitalRead(bit2);
- int digit3 = digitalRead(bit3);
-// int digit4 = digitalRead(bit4);
+
 int state_recive = digitalRead(recive_cmd_fpga);
 while(state_recive == LOW){//รอค่าจาก fpga
     state_recive = digitalRead(recive_cmd_fpga);
     Serial.println("Wait Reasult");
     delay(1000);
 }
-// while(digit3 == LOW && digit2 == LOW && digit1 == LOW && digit0 == LOW ){//รอค่าจาก fpga
-//   digit0 = digitalRead(bit0);
-//   digit1 = digitalRead(bit1);
-//   digit2 = digitalRead(bit2);
-//   digit3 = digitalRead(bit3);
-//   digit4 = digitalRead(bit4);
-//  Serial.println("Wait Reasult");
-//  delay(1000);
-// }
+ int digit0 = digitalRead(bit0);
+ int digit1 = digitalRead(bit1);
+ int digit2 = digitalRead(bit2);
+ int digit3 = digitalRead(bit3);
+
+
 digitalWrite(cmd,LOW); // stateส่งไปfpga
    if(digit3 == LOW && digit2 == LOW && digit1 == LOW && digit0 == LOW ){
     Serial.println("ส้มตำ");
