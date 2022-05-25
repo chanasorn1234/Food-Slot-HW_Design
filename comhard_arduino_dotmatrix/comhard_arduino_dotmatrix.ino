@@ -9,7 +9,9 @@ int bit0 = 2;
 int bit1 = 3;
 int bit2 = 4;
 int bit3 = 5;
-//int bit4 = 6;
+const int coinpin = 17;
+volatile int pulse = 0;
+boolean bInserted = false;
 int cmd = 7;
 int recive_cmd_fpga = 8;
 int statemoney = false;
@@ -29,6 +31,7 @@ MD_Parola P = MD_Parola(HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, MAX_DEVICES);
 MD_Parola P2 = MD_Parola(HARDWARE_TYPE, DATA_PIN2, CLK_PIN2, CS_PIN2, MAX_DEVICES);
 void setup() {
   Serial.begin(115200);
+  attachInterrupt(digitalPinToInterrupt(coinpin), coinInterrupt, RISING);
   ArduinoSerial.begin(4800);
   P.begin();
   P2.begin();
@@ -47,7 +50,10 @@ void loop() {
   P2.print("");
   statemoney = false;
  while(statemoney == false){ //นับเหรียญจากเครื่องยอดเหรียญ
-  statemoney = true;
+  Serial.println(pulse);
+  if(pulse == 3){
+    statemoney = true;
+  }
   delay(1000);
  }
  digitalWrite(cmd,HIGH); // stateส่งไปfpga
@@ -222,4 +228,17 @@ digitalWrite(cmd,LOW); // stateส่งไปfpga
 //    ArduinoSerial.print("\n");
 //  }
 delay(1000);
+}
+void coinInterrupt(){
+ 
+  // Each time a pulse is sent from the coin acceptor,
+  // interrupt main loop to add 1  and flip on the LED
+  pulse++ ;
+  bInserted = true;
+
+ // digitalWrite(ledpin, HIGH);
+ Serial.print( "ME TUNG " );
+  Serial.print( pulse );
+    Serial.println( " BAHT" );
+   
 }
